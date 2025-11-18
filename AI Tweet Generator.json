@@ -1,0 +1,420 @@
+{
+  "name": "AI Tweet Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        0,
+        200
+      ],
+      "typeVersion": 1,
+      "id": "0a40680c-0b91-4a97-aba0-ba2b051a6e52"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Content",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        704,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "33c22234-4baf-4e99-92c6-e4283dedebc2"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        304,
+        368
+      ],
+      "id": "9bdd145c-00db-4ea2-99f6-9a1fa34c6bca",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "LPROD33lXNS2rlVi",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        512,
+        368
+      ],
+      "id": "80feaca6-c1d1-4197-a279-41a790c23c2c",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "JPOjdZ9IxtQifEz0",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -128
+      ],
+      "id": "160b7cf2-33a6-42ab-961a-4d464fd36328",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Research the most recent and important AI and tech updates using Tavily. Prioritize news from the last 24–48 hours.\n\nThen generate:\n1) A short, catchy tweet (15–30 words)\n2) On a new line: 3–6 relevant hashtags (no hallucinations)\n\nMake the tweet punchy, clean, and scroll-stopping. Avoid fluff, avoid generic positivity, avoid corporate tone. \n",
+        "options": {
+          "systemMessage": "You are an AI agent specialized in generating short, catchy Twitter posts about the most recent breakthroughs in technology, AI, startups, and industry trends.\n\nYour job:\n1. Use the Tavily search tool aggressively to pull **the most recent, verifiable updates** in tech and AI. Prioritize news from the last 24–48 hours.\n2. Distill the findings into a concise, punchy, human-sounding tweet.\n3. Avoid corporate-sounding writing, filler words, or generic hype.\n4. Keep the tweet short and scroll-stopping. Aim for 15–35 words.\n5. Use simple language but strong hooks. Every tweet must have tension, insight, or an “aha” moment.\n6. Include **3–6 relevant, non-cringe hashtags** at the end. Mix broad tags (#AI, #Tech, #Startups) with specific ones tied to the update.\n7. NEVER fabricate news. Use Tavily results only. No hallucinations.\n8. Write like a human who’s plugged into the industry—not like a bot summarizing an article.\n9. Avoid emojis unless the update genuinely benefits from 1–2 max.\n\nWriting style guidelines:\n- Sound like a sharp tech creator on X.\n- Direct, bold, and insightful.\n- Hook first, substance second.\n- No long sentences, no walls of text.\n- No disclaimers or meta-comments.\n\nYour output must be:\n1. Do NOT write anything except:\n   a) the tweet \n   b) the hashtags (on a separate line)\n2. Keep the tweet 15–30 words max.\n3. Make it feel human — punchy, direct, simple, scroll-stopping.\n4. No corporate speak, no fluff, no generic hype.\n5. No emojis unless absolutely necessary (and max 1).\n6. Never fabricate details. Only use information from Tavily results.\n7. Hashtags must be 3–6, relevant, non-cringe, and placed ONLY on the second line.\n8. Do not include sources or explanations. Only tweet, then hashtags."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        192
+      ],
+      "id": "7e9b95e9-b388-4dc0-8f09-771b9857cd1c",
+      "name": "Tweet Generator"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appoGAeRcHSK4N61l",
+          "mode": "list",
+          "cachedResultName": "Tweet Generator",
+          "cachedResultUrl": "https://airtable.com/appoGAeRcHSK4N61l"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSE4Zd9dGc1aX6P",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appoGAeRcHSK4N61l/tblSE4Zd9dGc1aX6P"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tweet": "={{ $json.Content }}",
+            "Hashtags": "="
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tweet",
+              "displayName": "Tweet",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Assignee",
+              "displayName": "Assignee",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachments",
+              "displayName": "Attachments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachment Summary",
+              "displayName": "Attachment Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        192
+      ],
+      "id": "fcb6d554-3a73-4689-aa01-f9b4e47780d7",
+      "name": "Upload Tweet in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "2Cfox8CX19hHtggp",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.fields.Tweet }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        192
+      ],
+      "id": "b7b49f19-1ad6-414d-a271-2cb4d7c372df",
+      "name": "Post Tweet",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "ZGZnTztbuXlwFuJk",
+          "name": "X account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Trigger\n### For testing\n",
+        "height": 240,
+        "width": 256,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        128
+      ],
+      "id": "12721943-41cc-423b-ab61-de7709efa287",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Scheduled Trigger\nUse it at the end to set up the timing for the trigger  ",
+        "height": 240,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -208
+      ],
+      "id": "7ef9eb4d-e681-4d6d-b3aa-6051dd4339d5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Tweet Generator \n1. Uses Claude Sonnet to write the tweet\n2. Uses Tavily to research based on your topic",
+        "height": 464,
+        "width": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        48
+      ],
+      "id": "20118b0c-254f-4e43-9af5-972446356466",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Storing Output \n1, Editing the fields \n2. Storing the tweet in Airtable DB",
+        "height": 384,
+        "width": 320,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        688,
+        32
+      ],
+      "id": "baee281a-83d6-47c6-b56f-7e5cb2cf36e1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Posting the tweet\n",
+        "height": 208,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        128
+      ],
+      "id": "033fa664-bcbf-4c41-ae7c-ee549c2a5eac",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Upload Tweet in Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On clicking 'execute'": {
+      "main": [
+        [
+          {
+            "node": "Tweet Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Tweet Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Tweet Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tweet Generator": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Tweet in Airtable": {
+      "main": [
+        [
+          {
+            "node": "Post Tweet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8c75578b-e92b-46dd-82bc-f05b32ad5b91",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "jz79IOl81dke1MZq",
+  "tags": []
+}
